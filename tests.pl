@@ -34,11 +34,11 @@ test('tile evolution') :-
   next_tile_value(16, 32).
 
 test('merge two tiles') :-
-  merge_tiles(tile(1, 2, 2), tile(3, 2, 2), left, tile(3, 2, 4)),
-  merge_tiles(tile(3, 2, 2), tile(1, 2, 2), left, tile(3, 2, 4)),
+  merge_tiles(tile(1, 2, 2), tile(3, 2, 2), right, tile(3, 2, 4)),
+  merge_tiles(tile(3, 2, 2), tile(1, 2, 2), right, tile(3, 2, 4)),
 
-  merge_tiles(tile(1, 2, 2), tile(3, 2, 2), right, tile(1, 2, 4)),
-  merge_tiles(tile(3, 2, 2), tile(1, 2, 2), right, tile(1, 2, 4)),
+  merge_tiles(tile(1, 2, 2), tile(3, 2, 2), left, tile(1, 2, 4)),
+  merge_tiles(tile(3, 2, 2), tile(1, 2, 2), left, tile(1, 2, 4)),
 
   merge_tiles(tile(3, 1, 4), tile(3, 2, 4), up, tile(3, 1, 8)),
   merge_tiles(tile(3, 2, 4), tile(3, 1, 4), up, tile(3, 1, 8)),
@@ -73,11 +73,30 @@ test('Find two mergeable tiles') :-
   find_mergeables(Field, up, Mergeables),
   Mergeables = [mergeable(tile(1, 0, 2), tile(1, 2, 2), tile(1, 0, 4))].
 
-test('Cannot merge interleaved tiles when moving up') :-
+test('Mmerge only non-interleaved tiles when moving up') :-
   empty_field([5, 4], EmptyField),
   Tiles = [tile(1, 0, 2), tile(1, 1, 4), tile(1, 3, 2), tile(1, 4, 4), tile(2, 1, 8), tile(2, 3, 8)],
   add_tiles(EmptyField, Tiles, Field),
   find_mergeables(Field, up, [mergeable(tile(2, 1, 8), tile(2, 3, 8), tile(2, 1, 16))]).
+
+test('Merge only non-interleaved tiles when moving down') :-
+  empty_field([5, 4], EmptyField),
+  Tiles = [tile(1, 0, 2), tile(1, 1, 4), tile(1, 3, 2), tile(1, 4, 4), tile(2, 1, 8), tile(2, 3, 8)],
+  add_tiles(EmptyField, Tiles, Field),
+  find_mergeables(Field, down, [mergeable(tile(2, 1, 8), tile(2, 3, 8), tile(2, 3, 16))]).
+
+test('Merge only non-interleaved tiles when moving left') :-
+  empty_field([5, 4], EmptyField),
+  Tiles = [
+    tile(0, 0, 2), tile(2, 0, 2), tile(3, 0, 32), 
+    tile(2, 1, 16), tile(3, 1, 16), tile(0, 2, 4), 
+    tile(2, 2, 8), tile(3, 2, 4), tile(1, 3, 2)],
+  add_tiles(EmptyField, Tiles, Field),
+  find_mergeables(Field, left, Mergeables),
+  sort([
+      mergeable(tile(2, 1, 16), tile(3, 1, 16), tile(2, 1, 32)),
+      mergeable(tile(0, 0, 2), tile(2, 0, 2), tile(0, 0, 4))], 
+    Mergeables).
 
 %test('Slide field with a single element to the right') :-
 %  empty_field([4, 5], Field),

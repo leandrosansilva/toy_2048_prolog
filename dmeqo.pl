@@ -37,40 +37,21 @@ merge_tiles(Tile1, Tile2, Dir, Tile3) :-
   Tile1 \= Tile2,
   next_tile_value(V, NewValue),
 
+  (member(Dir, [left, right]), Y1 = Y2, Y3 = Y1;
+   member(Dir, [up, down]), X1 = X2, X3 = X1),
+
   % FIXME: I still can refactor this code to remove copy-paste...
-  (
-    Dir = left,
-    Y1 = Y2,
-    Y3 = Y1,
-    max_list([X1, X2], X3), !;
-
-    Dir = right,
-    Y1 = Y2,
-    Y3 = Y1,
-    min_list([X1, X2], X3), !;
-
-    Dir = up,
-    X1 = X2,
-    X3 = X1,
-    min_list([Y1, Y2], Y3), !;
-
-    Dir = down,
-    X1 = X2,
-    X3 = X1,
-    max_list([Y1, Y2], Y3)
-  ).
-  % nl, write("Merge dir: "),
-  % write(Dir), write(" "),
-  % write(Tile1), write(" "),
-  % write(Tile2), write(" to: "),
-  % write(Tile3), nl.
+  (Dir = left, min_list([X1, X2], X3), !;
+   Dir = right, max_list([X1, X2], X3), !;
+   Dir = up, min_list([Y1, Y2], Y3), !;
+   Dir = down, max_list([Y1, Y2], Y3)).
 
 find_mergeables(Field, Dir, Mergeables) :-
-  up = Dir,
   findall(
     mergeable(Tile1, Tile2, Merged), 
     merge_tiles(Field, Tile1, Tile2, Merged, Dir), 
-    Mergeables).
+    MergeablesRaw),
+  list_to_ord_set(MergeablesRaw, Mergeables).
 
 merge_tiles(field(Used, Empty), Tile1, Tile2, Merged, Dir) :-
   member(Tile1, Used),
@@ -79,10 +60,25 @@ merge_tiles(field(Used, Empty), Tile1, Tile2, Merged, Dir) :-
   merge_tiles(Tile1, Tile2, Dir, Merged),
   tiles_connect(Tile1, Tile2, Dir, Empty).
 
-tiles_connect(tile(X, Y1, _), tile(X, Y2, _), up, Empty) :-
+% Is possible to "trace a line" between two tiles?
+tiles_connect(tile(X1, Y1, _), tile(X2, Y2, _), Dir, Empty) :-
+  findall(
+    [X, Y],
+    between_tiles(Dir, [X1, Y1], [X2, Y2], [X, Y]),
+    BetweenRaw),
+  list_to_ord_set(BetweenRaw, Between),
+  ord_subset(Between, Empty).
+
+between_tiles(Dir, [X, Y1], [X, Y2], [X, Y]) :-
+  member(Dir, [up, down]),
   msort([Y1, Y2], [PrevBegin, SuccEnd]),
   succ(PrevBegin, Begin),
   succ(End, SuccEnd),
-  findall([X, Y], between(Begin, End, Y), BetweenRaw),
-  list_to_ord_set(BetweenRaw, Between),
-  ord_subset(Between, Empty).
+  between(Begin, End, Y).
+
+between_tiles(Dir, [X1, Y], [X2, Y], [X, Y]) :-
+  member(Dir, [left, right]),
+  msort([X1, X2], [PrevBegin, SuccEnd]),
+  succ(PrevBegin, Begin),
+  succ(End, SuccEnd),
+  between(Begin, End, X).
