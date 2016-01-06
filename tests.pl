@@ -10,7 +10,7 @@ test('create empty fields 3,3') :-
   empty_field([3, 3], field(UsedTiles, EmptyTiles)),
   length(UsedTiles, 0),
   length(EmptyTiles, 9).
-  
+
 test('create empty fields 4,5') :-
   empty_field([4, 5], field(UsedTiles, EmptyTiles)),
   length(UsedTiles, 0),
@@ -66,12 +66,18 @@ test('Fill field with several tiles (dev helper)') :-
   length(UsedTiles, LengthTiles),
   length(EmptyTiles, 18).
 
-test('Find merging pairs') :-
+test('Find two mergeable tiles') :-
   empty_field([4, 4], EmptyField),
-  find_merging_pairs(EmptyField, []).
-  %Tiles = [tile(1, 0, 2), tile(1, 0, 2), tile(0, 1, 2)i],
-  %add_tiles(EmptyField, Tiles, Field),
+  find_mergeables(EmptyField, up, []),
+  add_tiles(EmptyField, [tile(1, 0, 2), tile(1, 2, 2)], Field),
+  find_mergeables(Field, up, Mergeables),
+  Mergeables = [mergeable(tile(1, 0, 2), tile(1, 2, 2), tile(1, 0, 4))].
 
+test('Cannot merge interleaved tiles when moving up') :-
+  empty_field([5, 4], EmptyField),
+  Tiles = [tile(1, 0, 2), tile(1, 1, 4), tile(1, 3, 2), tile(1, 4, 4), tile(2, 1, 8), tile(2, 3, 8)],
+  add_tiles(EmptyField, Tiles, Field),
+  find_mergeables(Field, up, [mergeable(tile(2, 1, 8), tile(2, 3, 8), tile(2, 1, 16))]).
 
 %test('Slide field with a single element to the right') :-
 %  empty_field([4, 5], Field),
