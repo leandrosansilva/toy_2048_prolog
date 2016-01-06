@@ -4,26 +4,29 @@ empty_field([H, W], field([], Empty)) :-
   succ(MaxX, W),
   succ(MaxY, H),
   findall(
-    pos(X, Y), (
+    [X, Y], (
       between(0, MaxX, X), 
       between(0, MaxY, Y)),
     GenEmpty),
   list_to_ord_set(GenEmpty, Empty).
 
 % it's private because in the real game
-% only tile with value 2 can be added
-add_tile_private(field(Used, Empty), [X, Y, TileValue], field(NewUsed, NewEmpty)) :-
-  ord_add_element(Used, tile(X, Y, TileValue), NewUsed),
-  ord_del_element(Empty, pos(X, Y), NewEmpty).
+% only tile with value 2 or 4 can be added
+add_tile_private(Field, Tile , NewField) :-
+  add_tiles(Field, [Tile], NewField).
 
-add_tile(Field, [X, Y], NewField) :- 
-  add_tile_private(Field, [X, Y, 2], NewField).
+add_tile(Field, Tile, NewField) :- 
+  tile(_, _, Value) = Tile,
+  member(Value, [2, 4]), !,
+  add_tile_private(Field, Tile, NewField).
 
-add_tile_private(field(Used, Empty), [X, Y, TileValue], field(NewUsed, NewEmpty)) :-
-  ord_add_element(Used, tile(X, Y, TileValue), NewUsed),
-  ord_del_element(Empty, pos(X, Y), NewEmpty).
+add_tiles(field(Used, Empty), TilesRaw, field(NewUsed, NewEmpty)) :-
+  list_to_ord_set(TilesRaw, Tiles),
+  ord_union(Used, Tiles, NewUsed),
+  findall([X, Y], member(tile(X, Y, _), TilesRaw), PositionsRaw),
+  list_to_ord_set(PositionsRaw, Positions),
+  ord_subtract(Empty, Positions, NewEmpty).
  
-
 next_tile_value(Value, NextValue) :-
   NextValue is Value * 2.
 
