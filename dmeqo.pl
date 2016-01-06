@@ -61,14 +61,13 @@ merge_tiles(field(Used, Empty), Tile1, Tile2, Merged, Dir) :-
   tiles_connect(Tile1, Tile2, Dir, Empty).
 
 % Is possible to "trace a line" between two tiles?
+% FIXME: I don't need to create the Between list.
+%        It's possible to search directly on Empty...
 tiles_connect(tile(X1, Y1, _), tile(X2, Y2, _), Dir, Empty) :-
-  findall(
-    [X, Y],
-    between_tiles(Dir, [X1, Y1], [X2, Y2], [X, Y]),
-    BetweenRaw),
-  list_to_ord_set(BetweenRaw, Between),
-  ord_subset(Between, Empty).
+  forall(between_tiles(Dir, [X1, Y1], [X2, Y2], [X, Y]),
+         ord_memberchk([X, Y], Empty)).
 
+% TODO: It's still possible to refactor between_tiles.
 between_tiles(Dir, [X, Y1], [X, Y2], [X, Y]) :-
   member(Dir, [up, down]),
   msort([Y1, Y2], [PrevBegin, SuccEnd]),
