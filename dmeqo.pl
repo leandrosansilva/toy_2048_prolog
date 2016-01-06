@@ -51,6 +51,7 @@ find_mergeables(Field, Dir, Mergeables) :-
     mergeable(Tile1, Tile2, Merged), 
     merge_tiles(Field, Tile1, Tile2, Merged, Dir), 
     MergeablesRaw),
+
   list_to_ord_set(MergeablesRaw, Mergeables).
 
 merge_tiles(field(Used, Empty), Tile1, Tile2, Merged, Dir) :-
@@ -61,8 +62,6 @@ merge_tiles(field(Used, Empty), Tile1, Tile2, Merged, Dir) :-
   tiles_connect(Tile1, Tile2, Dir, Empty).
 
 % Is possible to "trace a line" between two tiles?
-% FIXME: I don't need to create the Between list.
-%        It's possible to search directly on Empty...
 tiles_connect(tile(X1, Y1, _), tile(X2, Y2, _), Dir, Empty) :-
   forall(between_tiles(Dir, [X1, Y1], [X2, Y2], [X, Y]),
          ord_memberchk([X, Y], Empty)).
@@ -81,3 +80,22 @@ between_tiles(Dir, [X1, Y], [X2, Y], [X, Y]) :-
   succ(PrevBegin, Begin),
   succ(End, SuccEnd),
   between(Begin, End, X).
+
+merge_tiles_on_field(Field, Dir, field(MergedUsed, MergedEmpty)) :-
+  field(Used, Empty) = Field,
+  find_mergeables(Field, Dir, Mergeables),
+
+  findall(Tile, (
+    member(mergeable(Tile, _, _), Mergeables);
+    member(mergeable(_, Tile, _), Mergeables);
+    member(mergeable(_, _, Tile), Mergeables)
+  ), AllNewTilesRaw),
+  list_to_ord_set(AllNewTilesRaw, AllNewTiles),
+  ord_symdiff(Used, AllNewTiles, MergedUsed),
+
+  findall([X, Y], (
+    member(mergeable(tile(NX, NY, _), tile(X, Y, _), tile(NX, NY, _)), Mergeables);
+    member(mergeable(tile(X, Y, _), tile(NX, NY, _), tile(NX, NY, _)), Mergeables)
+  ), AllNewPositionsRaw),
+  list_to_ord_set(AllNewPositionsRaw, AllNewPositions),
+  ord_union(Empty, AllNewPositions, MergedEmpty).

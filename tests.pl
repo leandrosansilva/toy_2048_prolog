@@ -111,16 +111,26 @@ test('Merge only non-interleaved tiles when moving right') :-
       mergeable(tile(0, 0, 2), tile(2, 0, 2), tile(2, 0, 4))], 
     Mergeables).
 
-% test('When 3 are mergeable, merge two and let one alone') :-
-%   empty_field([4, 4], EmptyField),
-%   Tiles = [tile(1, 1, 8), tile(2, 1, 8), tile(3, 1, 8)], 
-%   add_tiles(EmptyField, Tiles, Field),
-%   find_mergeables(Field, right, [mergeable(tile(2, 1, 16), tile(3, 1, 16), tile(3, 1, 32))]).
+test('When 3 are mergeable, merge two and let one alone') :-
+  empty_field([4, 4], EmptyField),
+  Tiles = [tile(1, 1, 8), tile(2, 1, 8), tile(3, 1, 8)], 
+  add_tiles(EmptyField, Tiles, Field),
+  find_mergeables(Field, right, [mergeable(tile(2, 1, 16), tile(3, 1, 16), tile(3, 1, 32))]).
 
-%test('Slide field with a single element to the right') :-
-%  empty_field([4, 5], Field),
-%  add_tile(Field, [1, 2], NewField),
-%  move_tiles(NewField, left, field([tile(4, 2)], Empty)),
-%  length(Empty, 19).
+test('Merge tiles on-field') :-
+  empty_field([4, 4], EmptyField),
+  Tiles = [
+    tile(0, 0, 2), tile(2, 0, 2), tile(3, 0, 32), 
+    tile(2, 1, 16), tile(3, 1, 16), tile(0, 2, 4), 
+    tile(2, 2, 8), tile(3, 2, 4), tile(1, 3, 2)],
+  add_tiles(EmptyField, Tiles, Field),
+  merge_tiles_on_field(Field, right, MergedField),
 
+  AfterMergedTiles = [
+    tile(2, 0, 4), tile(3, 0, 32), 
+    tile(3, 1, 32), tile(0, 2, 4),
+    tile(2, 2, 8), tile(3, 2, 4), tile(1, 3, 2)],
+
+  add_tiles(EmptyField, AfterMergedTiles, MergedField).
+  
 :- end_tests(dmeqo_tests).
