@@ -50,9 +50,7 @@ find_mergeables(Field, Dir, Mergeables) :-
   findall(
     mergeable(Tile1, Tile2, Merged), 
     merge_tiles(Field, Tile1, Tile2, Merged, Dir), 
-    MergeablesRaw),
-
-  list_to_ord_set(MergeablesRaw, Mergeables).
+    Mergeables).
 
 merge_tiles(field(Used, Empty), Tile1, Tile2, Merged, Dir) :-
   member(Tile1, Used),
@@ -81,6 +79,7 @@ between_tiles(Dir, [X1, Y], [X2, Y], [X, Y]) :-
   succ(End, SuccEnd),
   between(Begin, End, X).
 
+% FIXME: this predicate is way too complex :-(
 merge_tiles_on_field(Field, Dir, field(MergedUsed, MergedEmpty)) :-
   field(Used, Empty) = Field,
   find_mergeables(Field, Dir, Mergeables),
@@ -99,3 +98,44 @@ merge_tiles_on_field(Field, Dir, field(MergedUsed, MergedEmpty)) :-
   ), AllNewPositionsRaw),
   list_to_ord_set(AllNewPositionsRaw, AllNewPositions),
   ord_union(Empty, AllNewPositions, MergedEmpty).
+
+tiles_moves(field(Used, Empty), Dir, Moves) :-
+  findall(
+    move(Source, Dest),(
+      member(Source, Used),
+      new_tile_position(Source, Dir, Empty, Dest),
+      Source \= Dest),
+    Moves).
+
+% FIXME: 3 is the last column, and should come from the field
+new_tile_position(tile(X1, Y, V), right, Empty, tile(X2, Y, V)) :-
+  succ(X1, NextColumn),
+  aggregate_all(count, (
+    between(NextColumn, 3, Column),
+    ord_memberchk([Column, Y], Empty)),
+    NumberOfSpaces),
+  X2 is X1 + NumberOfSpaces.
+
+move_tiles(Field, Dir, MovedField) :-
+  merge_tiles_on_field(Field, Dir, MergedField),
+  move_tiles_on_field(MergedField, Dir, MovedField).
+
+% FIXME: I know, it's copy-paste. I'll refactor it...
+move_tiles_on_field(Field, Dir, field(MovedUsed, MovedEmpty)) :-
+  field(Used, Empty) = Field,
+  tiles_moves(Field, Dir, Moves),
+  findall(Tile, (
+    member(Source, Used),
+    member(move(Source, Dest), Moves),
+    (Tile = Source; Tile = Dest)),
+    TilesOnMovesRaw
+  ),
+  list_to_ord_set(TilesOnMovesRaw, TilesOnMoves),
+  ord_symdiff(Used, TilesOnMoves, MovedUsed),
+
+  findall([X, Y], (
+    member(move(tile(X1, Y1, V), tile(X2, Y2, V)), Moves),
+    (X = X1, Y = Y1; X = X2, Y = Y2)
+  ), EmptyOnMovesRaw),
+  list_to_ord_set(EmptyOnMovesRaw, EmptyOnMoves),
+  ord_symdiff(Empty, EmptyOnMoves, MovedEmpty).
