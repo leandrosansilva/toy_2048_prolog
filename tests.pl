@@ -7,18 +7,21 @@
 :- begin_tests(dmeqo_tests).
 
 test('create empty fields 3,3') :-
-  empty_field([3, 3], field(UsedTiles, EmptyTiles)),
+  empty_field([3, 3], EmptyField),
+  field_properties(EmptyField, UsedTiles, EmptyTiles),
   length(UsedTiles, 0),
   length(EmptyTiles, 9).
 
 test('create empty fields 4,5') :-
-  empty_field([4, 5], field(UsedTiles, EmptyTiles)),
+  empty_field([4, 5], EmptyField),
+  field_properties(EmptyField, UsedTiles, EmptyTiles),
   length(UsedTiles, 0),
   length(EmptyTiles, 20).
 
 test('create empty fields 4,5 and adds one tile') :-
   empty_field([4, 5], Field),
-  add_tile(Field, tile(0, 0, 2), field([tile(0, 0, 2)], EmptyTiles)),
+  add_tile(Field, tile(0, 0, 2), NewField),
+  field_properties(NewField, [tile(0, 0, 2)], EmptyTiles),
   length(EmptyTiles, 19).
 
 test('only tiles with value 2 or 4 can be added') :-
@@ -62,7 +65,8 @@ test('Fill field with several tiles (dev helper)') :-
   Tiles = [tile(0, 0, 2), tile(1, 0, 4), tile(0, 1, 2)],
   length(Tiles, LengthTiles),
   empty_field([3, 7], Field),
-  add_tiles(Field, Tiles, field(UsedTiles, EmptyTiles)),
+  add_tiles(Field, Tiles, NewField),
+  field_properties(NewField, UsedTiles, EmptyTiles),
   length(UsedTiles, LengthTiles),
   length(EmptyTiles, 18).
 
