@@ -209,4 +209,29 @@ test('Merge and move tiles down - complex') :-
     tile(0, 3, 4), tile(1, 3, 2), tile(2, 3, 8), tile(3, 3, 4)],
   add_tiles(EmptyField, AfterMoveTiles, MovedField).
 
+test('Generate random new tile') :-
+  empty_field([4, 4], EmptyField),
+  Tiles = [
+    tile(0, 0, 2), tile(2, 0, 2), tile(3, 0, 32), 
+    tile(2, 1, 16), tile(3, 1, 16),
+    tile(0, 2, 4), tile(2, 2, 8), tile(3, 2, 4),
+    tile(1, 3, 2)],
+  add_tiles(EmptyField, Tiles, Field),
+  field_properties(Field, _, Empty), 
+  generate_new_random_tile(Field, tile(X, Y, Value)),
+  member(Value, [2, 4]),
+  member([X, Y], Empty).
+
+test('Print empty field') :-
+  empty_field([4, 4], Field),
+  print_field(Field, "|    |    |    |    |\n|    |    |    |    |\n|    |    |    |    |\n|    |    |    |    |\n").
+
+test('Print field with some elements') :-
+  empty_field([4, 4], EmptyField),
+  add_tiles(EmptyField, [
+    tile(0, 0, 2), tile(3, 0, 128),
+    tile(2, 2, 1024),
+    tile(0, 3, 16), tile(3, 3, 2048)], Field),
+  print_field(Field, "|   2|    |    | 128|\n|    |    |    |    |\n|    |    |1024|    |\n|  16|    |    |2048|\n").
+
 :- end_tests(dmeqo_tests).

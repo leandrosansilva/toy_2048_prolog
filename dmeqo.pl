@@ -158,3 +158,31 @@ move_tiles_on_field(Field, Dir, MovedField) :-
   ord_symdiff(Used, TilesOnMoves, MovedUsed),
   empty_field(Dimension, EmptyField),
   add_tiles(EmptyField, MovedUsed, MovedField).
+
+generate_new_random_tile(field(_, _, Empty), tile(X, Y, Value)) :-
+  random_member(Value, [2, 4]),
+  random_member([X, Y], Empty).
+
+print_field(field([H, W], Used, _), String) :-
+  succ(LastRow, H),
+  succ(LastColumn, W),
+  findall(Line, (
+    between(0, LastRow, Y), 
+    print_field_line(Used, Y, LastColumn, Line)),
+    LinesList),
+  flatten(LinesList, Codes),
+  string_codes(String, Codes).
+
+print_field_line(Used, Y, LastColumn, Line) :-
+  findall(Tile, (
+      between(0, LastColumn, X), 
+      print_tile(Used, X, Y, Tile)), 
+    LinePayload, `|\n`),
+  flatten(LinePayload, Line).  
+
+print_tile(Used, X, Y, Tile) :-
+  member(tile(X, Y, Value), Used), !,
+  format(string(S), '|~|~` t~d~4+', [Value]),
+  string_codes(S, Tile).
+
+print_tile(_, _, _, `|    `).
