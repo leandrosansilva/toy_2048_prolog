@@ -139,6 +139,17 @@ test('Obtain tiles moves right on an already merged field') :-
     move(tile(1, 3, 2), tile(3, 3, 2))
   ]).
 
+test('Obtain tiles moves left on an already merged field') :-
+  empty_field([4, 4], EmptyField),
+  Tiles = [
+    tile(1, 0, 2), tile(2, 0, 4), tile(3, 0, 8)],
+  add_tiles(EmptyField, Tiles, Field),
+  tiles_moves(Field, left, [
+    move(tile(1, 0, 2), tile(0, 0, 2)),
+    move(tile(2, 0, 4), tile(1, 0, 4)),
+    move(tile(3, 0, 8), tile(2, 0, 8))
+  ]).
+
 test('Merge and move field right - simple') :-
   empty_field([4, 4], EmptyField),
   Tiles = [
@@ -162,6 +173,21 @@ test('Merge and move tiles right - complex') :-
     tile(2, 0, 4), tile(3, 0, 32), 
     tile(3, 1, 32), tile(1, 2, 4),
     tile(2, 2, 8), tile(3, 2, 4), tile(3, 3, 2)],
+  add_tiles(EmptyField, AfterMoveTiles, MovedField).
+
+test('Merge and move tiles left - complex') :-
+  empty_field([4, 4], EmptyField),
+  Tiles = [
+    tile(0, 0, 2), tile(2, 0, 2), tile(3, 0, 32), 
+    tile(2, 1, 16), tile(3, 1, 16),
+    tile(0, 2, 4), tile(2, 2, 8), tile(3, 2, 4),
+    tile(1, 3, 2)],
+  add_tiles(EmptyField, Tiles, Field),
+  move_tiles(Field, left, MovedField),
+  AfterMoveTiles = [
+    tile(0, 0, 4), tile(1, 0, 32), 
+    tile(0, 1, 32), tile(0, 2, 4),
+    tile(1, 2, 8), tile(2, 2, 4), tile(0, 3, 2)],
   add_tiles(EmptyField, AfterMoveTiles, MovedField).
 
 :- end_tests(dmeqo_tests).

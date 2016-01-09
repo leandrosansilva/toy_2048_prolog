@@ -8,7 +8,7 @@ empty_field([H, W], field([], Empty)) :-
       between(0, MaxX, X),
       between(0, MaxY, Y)),
     GenEmpty),
-  list_to_ord_set(GenEmpty, Empty).
+  sort(GenEmpty, Empty).
 
 % it's private because in the real game
 % only tile with value 2 or 4 can be added
@@ -21,10 +21,10 @@ add_tile(Field, Tile, NewField) :-
   add_tile_private(Field, Tile, NewField).
 
 add_tiles(field(Used, Empty), TilesRaw, field(NewUsed, NewEmpty)) :-
-  list_to_ord_set(TilesRaw, Tiles),
+  sort(TilesRaw, Tiles),
   ord_union(Used, Tiles, NewUsed),
   findall([X, Y], member(tile(X, Y, _), TilesRaw), PositionsRaw),
-  list_to_ord_set(PositionsRaw, Positions),
+  sort(PositionsRaw, Positions),
   ord_subtract(Empty, Positions, NewEmpty).
 
 next_tile_value(Value, NextValue) :-
@@ -80,8 +80,8 @@ between_tiles(Dir, [X1, Y], [X2, Y], [X, Y]) :-
   between(Begin, End, X).
 
 % FIXME: this predicate is way too complex :-(
-merge_tiles_on_field(Field, Dir, field(MergedUsed, MergedEmpty)) :-
-  field(Used, Empty) = Field,
+merge_tiles_on_field(Field, Dir, MergedField) :-
+  field(Used, _) = Field,
   find_mergeables(Field, Dir, Mergeables),
 
   findall(Tile, (
@@ -89,15 +89,10 @@ merge_tiles_on_field(Field, Dir, field(MergedUsed, MergedEmpty)) :-
     member(mergeable(_, Tile, _), Mergeables);
     member(mergeable(_, _, Tile), Mergeables)
   ), AllNewTilesRaw),
-  list_to_ord_set(AllNewTilesRaw, AllNewTiles),
+  sort(AllNewTilesRaw, AllNewTiles),
   ord_symdiff(Used, AllNewTiles, MergedUsed),
-
-  findall([X, Y], (
-    member(mergeable(tile(NX, NY, _), tile(X, Y, _), tile(NX, NY, _)), Mergeables);
-    member(mergeable(tile(X, Y, _), tile(NX, NY, _), tile(NX, NY, _)), Mergeables)
-  ), AllNewPositionsRaw),
-  list_to_ord_set(AllNewPositionsRaw, AllNewPositions),
-  ord_union(Empty, AllNewPositions, MergedEmpty).
+  empty_field([4, 4], EmptyField),
+  add_tiles(EmptyField, MergedUsed, MergedField).
 
 tiles_moves(field(Used, Empty), Dir, Moves) :-
   findall(
@@ -116,13 +111,21 @@ new_tile_position(tile(X1, Y, V), right, Empty, tile(X2, Y, V)) :-
     NumberOfSpaces),
   X2 is X1 + NumberOfSpaces.
 
+new_tile_position(tile(X1, Y, V), left, Empty, tile(X2, Y, V)) :-
+  succ(PrevColumn, X1),
+  aggregate_all(count, (
+    between(0, PrevColumn, Column),
+    ord_memberchk([Column, Y], Empty)),
+    NumberOfSpaces),
+  X2 is X1 - NumberOfSpaces.
+
 move_tiles(Field, Dir, MovedField) :-
   merge_tiles_on_field(Field, Dir, MergedField),
   move_tiles_on_field(MergedField, Dir, MovedField).
 
-% FIXME: I know, it's copy-paste. I'll refactor it...
-move_tiles_on_field(Field, Dir, field(MovedUsed, MovedEmpty)) :-
-  field(Used, Empty) = Field,
+% FIXME: I know, it's copy-paste. I'll refactor it later...
+move_tiles_on_field(Field, Dir, MovedField) :-
+  field(Used, _) = Field,
   tiles_moves(Field, Dir, Moves),
   findall(Tile, (
     member(Source, Used),
@@ -130,12 +133,7 @@ move_tiles_on_field(Field, Dir, field(MovedUsed, MovedEmpty)) :-
     (Tile = Source; Tile = Dest)),
     TilesOnMovesRaw
   ),
-  list_to_ord_set(TilesOnMovesRaw, TilesOnMoves),
+  sort(TilesOnMovesRaw, TilesOnMoves),
   ord_symdiff(Used, TilesOnMoves, MovedUsed),
-
-  findall([X, Y], (
-    member(move(tile(X1, Y1, V), tile(X2, Y2, V)), Moves),
-    (X = X1, Y = Y1; X = X2, Y = Y2)
-  ), EmptyOnMovesRaw),
-  list_to_ord_set(EmptyOnMovesRaw, EmptyOnMoves),
-  ord_symdiff(Empty, EmptyOnMoves, MovedEmpty).
+  empty_field([4, 4], EmptyField),
+  add_tiles(EmptyField, MovedUsed, MovedField).
