@@ -119,6 +119,22 @@ new_tile_position(tile(X1, Y, V), left, Empty, tile(X2, Y, V)) :-
     NumberOfSpaces),
   X2 is X1 - NumberOfSpaces.
 
+new_tile_position(tile(X, Y1, V), up, Empty, tile(X, Y2, V)) :-
+  succ(PrevRow, Y1),
+  aggregate_all(count, (
+    between(0, PrevRow, Row),
+    ord_memberchk([X, Row], Empty)),
+    NumberOfSpaces),
+  Y2 is Y1 - NumberOfSpaces.
+
+new_tile_position(tile(X, Y1, V), down, Empty, tile(X, Y2, V)) :-
+  succ(Y1, NextRow),
+  aggregate_all(count, (
+    between(NextRow, 3, Row),
+    ord_memberchk([X, Row], Empty)),
+    NumberOfSpaces),
+  Y2 is Y1 + NumberOfSpaces.
+
 move_tiles(Field, Dir, MovedField) :-
   merge_tiles_on_field(Field, Dir, MergedField),
   move_tiles_on_field(MergedField, Dir, MovedField).
