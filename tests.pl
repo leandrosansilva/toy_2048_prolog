@@ -92,8 +92,8 @@ test('Merge only non-interleaved tiles when moving down') :-
 test('Merge only non-interleaved tiles when moving left') :-
   empty_field([5, 4], EmptyField),
   Tiles = [
-    tile(0, 0, 2), tile(2, 0, 2), tile(3, 0, 32), 
-    tile(2, 1, 16), tile(3, 1, 16), tile(0, 2, 4), 
+    tile(0, 0, 2), tile(2, 0, 2), tile(3, 0, 32),
+    tile(2, 1, 16), tile(3, 1, 16), tile(0, 2, 4),
     tile(2, 2, 8), tile(3, 2, 4), tile(1, 3, 2)],
   add_tiles(EmptyField, Tiles, Field),
   find_mergeables(Field, left, [
@@ -103,8 +103,8 @@ test('Merge only non-interleaved tiles when moving left') :-
 test('Merge only non-interleaved tiles when moving right') :-
   empty_field([5, 4], EmptyField),
   Tiles = [
-    tile(0, 0, 2), tile(2, 0, 2), tile(3, 0, 32), 
-    tile(2, 1, 16), tile(3, 1, 16), tile(0, 2, 4), 
+    tile(0, 0, 2), tile(2, 0, 2), tile(3, 0, 32),
+    tile(2, 1, 16), tile(3, 1, 16), tile(0, 2, 4),
     tile(2, 2, 8), tile(3, 2, 4), tile(1, 3, 2)],
   add_tiles(EmptyField, Tiles, Field),
   find_mergeables(Field, right, [
@@ -113,20 +113,20 @@ test('Merge only non-interleaved tiles when moving right') :-
 
 test('When 3 are mergeable, merge two and let one alone') :-
   empty_field([4, 4], EmptyField),
-  Tiles = [tile(1, 1, 8), tile(2, 1, 8), tile(3, 1, 8)], 
+  Tiles = [tile(1, 1, 8), tile(2, 1, 8), tile(3, 1, 8)],
   add_tiles(EmptyField, Tiles, Field),
   find_mergeables(Field, right, [mergeable(tile(2, 1, 16), tile(3, 1, 16), tile(3, 1, 32))]).
 
 test('Merge tiles on-field on moving right') :-
   empty_field([4, 4], EmptyField),
   Tiles = [
-    tile(0, 0, 2), tile(2, 0, 2), tile(3, 0, 32), 
-    tile(2, 1, 16), tile(3, 1, 16), tile(0, 2, 4), 
+    tile(0, 0, 2), tile(2, 0, 2), tile(3, 0, 32),
+    tile(2, 1, 16), tile(3, 1, 16), tile(0, 2, 4),
     tile(2, 2, 8), tile(3, 2, 4), tile(1, 3, 2)],
   add_tiles(EmptyField, Tiles, Field),
   merge_tiles_on_field(Field, right, MergedField),
   AfterMergedTiles = [
-    tile(2, 0, 4), tile(3, 0, 32), 
+    tile(2, 0, 4), tile(3, 0, 32),
     tile(3, 1, 32), tile(0, 2, 4),
     tile(2, 2, 8), tile(3, 2, 4), tile(1, 3, 2)],
   add_tiles(EmptyField, AfterMergedTiles, MergedField).
@@ -134,7 +134,7 @@ test('Merge tiles on-field on moving right') :-
 test('Obtain tiles moves right on an already merged field') :-
   empty_field([4, 4], EmptyField),
   Tiles = [
-    tile(2, 0, 4), tile(3, 0, 32), 
+    tile(2, 0, 4), tile(3, 0, 32),
     tile(3, 1, 32), tile(0, 2, 4),
     tile(2, 2, 8), tile(3, 2, 4), tile(1, 3, 2)],
   add_tiles(EmptyField, Tiles, Field),
@@ -157,24 +157,24 @@ test('Obtain tiles moves left on an already merged field') :-
 test('Merge and move field right - simple') :-
   empty_field([4, 4], EmptyField),
   Tiles = [
-    tile(0, 0, 4), tile(2, 3, 32)], 
+    tile(0, 0, 4), tile(2, 3, 32)],
   add_tiles(EmptyField, Tiles, Field),
   move_tiles(Field, right, MovedField),
   AfterMoveTiles = [
-    tile(3, 0, 4), tile(3, 3, 32)], 
+    tile(3, 0, 4), tile(3, 3, 32)],
   add_tiles(EmptyField, AfterMoveTiles, MovedField).
 
 test('Merge and move tiles right - complex') :-
   empty_field([4, 4], EmptyField),
   Tiles = [
-    tile(0, 0, 2), tile(2, 0, 2), tile(3, 0, 32), 
+    tile(0, 0, 2), tile(2, 0, 2), tile(3, 0, 32),
     tile(2, 1, 16), tile(3, 1, 16),
     tile(0, 2, 4), tile(2, 2, 8), tile(3, 2, 4),
     tile(1, 3, 2)],
   add_tiles(EmptyField, Tiles, Field),
   move_tiles(Field, right, MovedField),
   AfterMoveTiles = [
-    tile(2, 0, 4), tile(3, 0, 32), 
+    tile(2, 0, 4), tile(3, 0, 32),
     tile(3, 1, 32), tile(1, 2, 4),
     tile(2, 2, 8), tile(3, 2, 4), tile(3, 3, 2)],
   add_tiles(EmptyField, AfterMoveTiles, MovedField).
@@ -182,14 +182,14 @@ test('Merge and move tiles right - complex') :-
 test('Merge and move tiles up - complex') :-
   empty_field([4, 4], EmptyField),
   Tiles = [
-    tile(0, 0, 2), tile(2, 0, 2), tile(3, 0, 32), 
+    tile(0, 0, 2), tile(2, 0, 2), tile(3, 0, 32),
     tile(2, 1, 16), tile(3, 1, 16),
     tile(0, 2, 4), tile(2, 2, 8), tile(3, 2, 4),
     tile(1, 3, 2)],
   add_tiles(EmptyField, Tiles, Field),
   move_tiles(Field, up, MovedField),
   AfterMoveTiles = [
-    tile(0, 0, 2), tile(1, 0, 2), tile(2, 0, 2), tile(3, 0, 32), 
+    tile(0, 0, 2), tile(1, 0, 2), tile(2, 0, 2), tile(3, 0, 32),
     tile(0, 1, 4), tile(2, 1, 16), tile(3, 1, 16),
     tile(2, 2, 8), tile(3, 2, 4)],
   add_tiles(EmptyField, AfterMoveTiles, MovedField).
@@ -197,14 +197,14 @@ test('Merge and move tiles up - complex') :-
 test('Merge and move tiles down - complex') :-
   empty_field([4, 4], EmptyField),
   Tiles = [
-    tile(0, 0, 2), tile(2, 0, 2), tile(3, 0, 32), 
+    tile(0, 0, 2), tile(2, 0, 2), tile(3, 0, 32),
     tile(2, 1, 16), tile(3, 1, 16),
     tile(0, 2, 4), tile(2, 2, 8), tile(3, 2, 4),
     tile(1, 3, 2)],
   add_tiles(EmptyField, Tiles, Field),
   move_tiles(Field, down, MovedField),
   AfterMoveTiles = [
-    tile(2, 1, 2), tile(3, 1, 32), 
+    tile(2, 1, 2), tile(3, 1, 32),
     tile(0, 2, 2), tile(2, 2, 16), tile(3, 2, 16),
     tile(0, 3, 4), tile(1, 3, 2), tile(2, 3, 8), tile(3, 3, 4)],
   add_tiles(EmptyField, AfterMoveTiles, MovedField).
@@ -212,12 +212,12 @@ test('Merge and move tiles down - complex') :-
 test('Generate random new tile') :-
   empty_field([4, 4], EmptyField),
   Tiles = [
-    tile(0, 0, 2), tile(2, 0, 2), tile(3, 0, 32), 
+    tile(0, 0, 2), tile(2, 0, 2), tile(3, 0, 32),
     tile(2, 1, 16), tile(3, 1, 16),
     tile(0, 2, 4), tile(2, 2, 8), tile(3, 2, 4),
     tile(1, 3, 2)],
   add_tiles(EmptyField, Tiles, Field),
-  field_properties(Field, _, Empty), 
+  field_properties(Field, _, Empty),
   generate_new_random_tile(Field, tile(X, Y, Value)),
   member(Value, [2, 4]),
   member([X, Y], Empty).

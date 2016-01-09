@@ -51,8 +51,8 @@ merge_tiles(Tile1, Tile2, Dir, Tile3) :-
 
 find_mergeables(Field, Dir, Mergeables) :-
   findall(
-    mergeable(Tile1, Tile2, Merged), 
-    merge_tiles(Field, Tile1, Tile2, Merged, Dir), 
+    mergeable(Tile1, Tile2, Merged),
+    merge_tiles(Field, Tile1, Tile2, Merged, Dir),
     Mergeables).
 
 merge_tiles(field(_, Used, Empty), Tile1, Tile2, Merged, Dir) :-
@@ -167,7 +167,7 @@ print_field(field([H, W], Used, _), String) :-
   succ(LastRow, H),
   succ(LastColumn, W),
   findall(Line, (
-    between(0, LastRow, Y), 
+    between(0, LastRow, Y),
     print_field_line(Used, Y, LastColumn, Line)),
     LinesList),
   flatten(LinesList, Codes),
@@ -175,10 +175,10 @@ print_field(field([H, W], Used, _), String) :-
 
 print_field_line(Used, Y, LastColumn, Line) :-
   findall(Tile, (
-      between(0, LastColumn, X), 
-      print_tile(Used, X, Y, Tile)), 
+      between(0, LastColumn, X),
+      print_tile(Used, X, Y, Tile)),
     LinePayload, `|\n`),
-  flatten(LinePayload, Line).  
+  flatten(LinePayload, Line).
 
 print_tile(Used, X, Y, Tile) :-
   member(tile(X, Y, Value), Used), !,
