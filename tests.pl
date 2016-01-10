@@ -117,6 +117,14 @@ test('When 3 are mergeable, merge two and let one alone') :-
   add_tiles(EmptyField, Tiles, Field),
   find_mergeables(Field, right, [mergeable(tile(2, 1, 16), tile(3, 1, 16), tile(3, 1, 32))]).
 
+test('When 4 inline are mergeable, merge two groups of two') :-
+  empty_field([4, 4], EmptyField),
+  Tiles = [tile(0, 1, 8), tile(1, 1, 8), tile(2, 1, 8), tile(3, 1, 8)],
+  add_tiles(EmptyField, Tiles, Field),
+  find_mergeables(Field, right, [
+    mergeable(tile(0, 1, 16), tile(1, 1, 16), tile(1, 1, 32)), 
+    mergeable(tile(2, 1, 16), tile(3, 1, 16), tile(3, 1, 32))]).
+
 test('Merge tiles on-field on moving right') :-
   empty_field([4, 4], EmptyField),
   Tiles = [
