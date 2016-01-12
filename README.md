@@ -10,3 +10,8 @@ And yes, my prolog code sucks, I'm still new in Logic Programming :-)
 
 BTW, Dmeqo stands for *Dois Mil e Quarenta e Oito*, or something like that, which
 means *Two Thousands Forty Eight* in Portuguese.
+
+## How to run
+
+First of all install Swi-Prolog version 7.x and then run the *run.sh* script or
+compile the code with *make* and then execute the binary *dmeqo*.

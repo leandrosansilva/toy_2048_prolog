@@ -1,9 +1,13 @@
 % Vim, this is Prolog!
 
+% helper
+next_value(N, M) :- var(N), N is M - 1, !.
+next_value(N, M) :- var(M), M is N + 1.
+
 empty_field(Dimension, field(Dimension, [], Empty)) :-
   [H, W] = Dimension,
-  succ(MaxX, W),
-  succ(MaxY, H),
+  next_value(MaxX, W),
+  next_value(MaxY, H),
   findall(
     [X, Y], (
       between(0, MaxX, X),
@@ -71,15 +75,15 @@ tiles_connect(tile(X1, Y1, _), tile(X2, Y2, _), Dir, Empty) :-
 between_tiles(Dir, [X, Y1], [X, Y2], [X, Y]) :-
   member(Dir, [up, down]),
   msort([Y1, Y2], [PrevBegin, SuccEnd]),
-  succ(PrevBegin, Begin),
-  succ(End, SuccEnd),
+  next_value(PrevBegin, Begin),
+  next_value(End, SuccEnd),
   between(Begin, End, Y).
 
 between_tiles(Dir, [X1, Y], [X2, Y], [X, Y]) :-
   member(Dir, [left, right]),
   msort([X1, X2], [PrevBegin, SuccEnd]),
-  succ(PrevBegin, Begin),
-  succ(End, SuccEnd),
+  next_value(PrevBegin, Begin),
+  next_value(End, SuccEnd),
   between(Begin, End, X).
 
 % FIXME: this predicate is way too complex :-(
@@ -107,8 +111,8 @@ tiles_moves(field(Dimension, Used, Empty), Dir, Moves) :-
 
 % TODO: Refactor new_tile_position/5
 new_tile_position([_, W], tile(X1, Y, V), right, Empty, tile(X2, Y, V)) :-
-  succ(LastColumn, W),
-  succ(X1, NextColumn),
+  next_value(LastColumn, W),
+  next_value(X1, NextColumn),
   aggregate_all(count, (
     between(NextColumn, LastColumn, Column),
     ord_memberchk([Column, Y], Empty)),
@@ -116,7 +120,7 @@ new_tile_position([_, W], tile(X1, Y, V), right, Empty, tile(X2, Y, V)) :-
   X2 is X1 + NumberOfSpaces.
 
 new_tile_position(_, tile(X1, Y, V), left, Empty, tile(X2, Y, V)) :-
-  succ(PrevColumn, X1),
+  next_value(PrevColumn, X1),
   aggregate_all(count, (
     between(0, PrevColumn, Column),
     ord_memberchk([Column, Y], Empty)),
@@ -124,7 +128,7 @@ new_tile_position(_, tile(X1, Y, V), left, Empty, tile(X2, Y, V)) :-
   X2 is X1 - NumberOfSpaces.
 
 new_tile_position(_, tile(X, Y1, V), up, Empty, tile(X, Y2, V)) :-
-  succ(PrevRow, Y1),
+  next_value(PrevRow, Y1),
   aggregate_all(count, (
     between(0, PrevRow, Row),
     ord_memberchk([X, Row], Empty)),
@@ -132,8 +136,8 @@ new_tile_position(_, tile(X, Y1, V), up, Empty, tile(X, Y2, V)) :-
   Y2 is Y1 - NumberOfSpaces.
 
 new_tile_position([H, _], tile(X, Y1, V), down, Empty, tile(X, Y2, V)) :-
-  succ(LastRow, H),
-  succ(Y1, NextRow),
+  next_value(LastRow, H),
+  next_value(Y1, NextRow),
   aggregate_all(count, (
     between(NextRow, LastRow, Row),
     ord_memberchk([X, Row], Empty)),
@@ -164,8 +168,8 @@ generate_new_random_tile(field(_, _, Empty), tile(X, Y, Value)) :-
   random_member([X, Y], Empty).
 
 print_field(field([H, W], Used, _), String) :-
-  succ(LastRow, H),
-  succ(LastColumn, W),
+  next_value(LastRow, H),
+  next_value(LastColumn, W),
   findall(Line, (
     between(0, LastRow, Y),
     print_field_line(Used, Y, LastColumn, Line)),

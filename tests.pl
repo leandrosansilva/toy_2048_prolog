@@ -217,6 +217,22 @@ test('Merge and move tiles down - complex') :-
     tile(0, 3, 4), tile(1, 3, 2), tile(2, 3, 8), tile(3, 3, 4)],
   add_tiles(EmptyField, AfterMoveTiles, MovedField).
 
+test('Merge and move tiles - buggy case') :-
+  empty_field([2, 1], EmptyField),
+  add_tiles(EmptyField, [tile(0, 1, 2)], Field),
+  % up
+  move_tiles(Field, up, UpMovedField),
+  add_tiles(EmptyField, [tile(0, 0, 2)], UpMovedField),
+  % down
+  move_tiles(Field, down, DownMovedField),
+  add_tiles(EmptyField, [tile(0, 1, 2)], DownMovedField),
+  % left
+  move_tiles(Field, left, LeftMovedField),
+  add_tiles(EmptyField, [tile(0, 1, 2)], LeftMovedField),
+  % right
+  move_tiles(Field, right, RightMovedField),
+  add_tiles(EmptyField, [tile(0, 1, 2)], RightMovedField).
+
 test('Generate random new tile') :-
   empty_field([4, 4], EmptyField),
   Tiles = [
