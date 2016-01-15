@@ -29,8 +29,8 @@ move_field_from_user_input(Field, NewField) :-
     NewField = MovedField
   ).
 
-% read_move_direction(Direction) :- 
-%   random_member(Direction, [right, down, left, up]), !.
+%read_move_direction(Direction) :- 
+%  random_member(Direction, [right, down, left, up]), !.
 
 read_move_direction(Direction) :-
   get_single_char(27), % ESC

@@ -90,16 +90,15 @@ between_tiles(Dir, [X1, Y], [X2, Y], [X, Y]) :-
 merge_tiles_on_field(Field, Dir, MergedField) :-
   field(Dimension, Used, _) = Field,
   find_mergeables(Field, Dir, Mergeables),
-
-  findall(Tile, (
-    member(mergeable(Tile, _, _), Mergeables);
-    member(mergeable(_, Tile, _), Mergeables);
-    member(mergeable(_, _, Tile), Mergeables)
-  ), AllNewTilesRaw),
+  foldl(merge_tiles_on_field_util, Mergeables, [], AllNewTilesRaw),
   sort(AllNewTilesRaw, AllNewTiles),
   ord_symdiff(Used, AllNewTiles, MergedUsed),
   empty_field(Dimension, EmptyField),
   add_tiles(EmptyField, MergedUsed, MergedField).
+
+merge_tiles_on_field_util(mergeable(Tile1, Tile2, Tile3), Acc, NewAcc) :-
+  (member(Tile, Acc), (Tile = Tile1; Tile = Tile2), !;
+   NewAcc = [Tile1, Tile2, Tile3|Acc]).
 
 tiles_moves(field(Dimension, Used, Empty), Dir, Moves) :-
   findall(
