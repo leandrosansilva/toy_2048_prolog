@@ -97,8 +97,8 @@ merge_tiles_on_field(Field, Dir, MergedField) :-
   add_tiles(EmptyField, MergedUsed, MergedField).
 
 merge_tiles_on_field_util(mergeable(Tile1, Tile2, Tile3), Acc, NewAcc) :-
-  (member(Tile, Acc), (Tile = Tile1; Tile = Tile2), !;
-   NewAcc = [Tile1, Tile2, Tile3|Acc]).
+  (member(Tile1, Acc); member(Tile2, Acc)), NewAcc = Acc, !;
+  NewAcc = [Tile1, Tile2, Tile3|Acc].
 
 tiles_moves(field(Dimension, Used, Empty), Dir, Moves) :-
   findall(
